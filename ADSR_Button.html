@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang = "en">
+<meta charset="UTF-8">
+<title>ADSR_Works</title>
+</head>
+<body>
+
+    <button> Play</button>
+
+    <script>
+        function playNote(someContext, frequency, duration)
+        {
+            const osc1 = new OscillatorNode(someContext);
+            const osc2 = new OscillatorNode(someContext);
+            const gain = new GainNode(someContext);
+        
+            
+            osc1.frequency.value = frequency;
+            osc2.frequency.value = frequency*2.01;
+            osc1.type = "triangle"
+            osc2.type = "triangle"
+            gain.gain.value = 0;
+
+            osc1.connect(gain).connect(someContext.destination);
+            osc2.connect(gain).connect(someContext.destination);
+
+            let now = someContext.currentTime;
+
+            gain.gain.linearRampToValueAtTime(0.30, now + 0.01); //attack
+            gain.gain.linearRampToValueAtTime(0.10, now + 0.01 + 0.08) //decay
+            gain.gain.linearRampToValueAtTime(0.30, now + 0.01 + 0.08 + 0.9)
+            gain.gain.linearRampToValueAtTime(0, now + duration); //release
+
+            osc1.start();
+            osc1.stop(now + duration);
+
+            osc2.start();
+            osc2.stop(now + duration);
+
+        }
+
+        const myCtx = new AudioContext();
+        let freq = 220
+
+        document.querySelector("button").onclick = () => playNote(myCtx, freq, 1);
+    </script>
+    
+</body>
+
+</html>

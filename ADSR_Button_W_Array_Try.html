@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang = "en">
+<meta charset="UTF-8">
+<title>ADSR_Works</title>
+</head>
+<body>
+
+    <button id = "Play"> Play</button>
+    
+
+    <script>
+        function playNote(someContext, frequency, duration)
+        {
+            const osc1 = new OscillatorNode(someContext);
+            const osc2 = new OscillatorNode(someContext);
+            const osc3 = new OscillatorNode(someContext);
+            const gain = new GainNode(someContext);
+        
+            
+            osc1.frequency.value = frequency;
+            osc2.frequency.value = frequency*2.01;
+            osc3.frequency.value = frequency*1.01;
+            osc1.type = "triangle"
+            osc2.type = "triangle"
+            osc3.type = "sine"
+            gain.gain.value = 0;
+
+            osc1.connect(gain).connect(someContext.destination);
+            osc2.connect(gain).connect(someContext.destination);
+            osc3.connect(gain).connect(someContext.destination);
+
+            let now = someContext.currentTime;
+
+            gain.gain.linearRampToValueAtTime(0.25, now + 0.01); //attack
+            gain.gain.linearRampToValueAtTime(0.10, now + 0.01 + 0.2)
+            gain.gain.linearRampToValueAtTime(0, now + duration); //release
+
+            osc1.start();
+            osc1.stop(now + duration);
+
+            osc2.start();
+            osc2.stop(now + duration);
+
+            osc3.start();
+            osc3.stop(now + duration);
+
+        }
+        
+        
+        const midiPitches = [60, 62, 63, 67, 69, 72];
+        const randomPitch = function() {
+    // Pick a random MIDI note number from the midiPitches array
+    let randoMidiNote = midiPitches[Math.floor(Math.random() * midiPitches.length)];
+
+    // Convert the MIDI note number to frequency (Hz) using the formula
+    // MIDI note 69 = A4 = 440 Hz, each semitone is 2^(1/12) times higher
+    let newFreq = 440 * 2 ** ((randoMidiNote - 69) / 12);
+
+    // Return the frequency value so it can be used in sound synthesis
+    return newFreq;
+
+        }
+
+        const myCtx = new AudioContext();
+        
+
+        document.querySelector("#Play").onclick = () => playNote(myCtx, randomPitch(), 2);
+    
+       
+    </script>
+    
+</body>
+
+</html>
