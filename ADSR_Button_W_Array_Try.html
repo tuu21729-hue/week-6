@@ -5,8 +5,10 @@
 </head>
 <body>
 
-    <button id = "Play"> Play</button>
-    
+    <button id = "Button1"> Play1st</button>
+    <button id = "Button2"> Play2nd</button>
+<button id = "Button3"> Play3rd</button>
+<button id = "Button4"> Play4th</button>
 
     <script>
         function playNote(someContext, frequency, duration)
@@ -47,27 +49,65 @@
         }
         
         
-        const midiPitches = [60, 62, 63, 67, 69, 72];
-        const randomPitch = function() {
-    // Pick a random MIDI note number from the midiPitches array
-    let randoMidiNote = midiPitches[Math.floor(Math.random() * midiPitches.length)];
+      
+    let newFreq1 = 440 
+let dur1 = 2 
 
-    // Convert the MIDI note number to frequency (Hz) using the formula
-    // MIDI note 69 = A4 = 440 Hz, each semitone is 2^(1/12) times higher
-    let newFreq = 440 * 2 ** ((randoMidiNote - 69) / 12);
 
-    // Return the frequency value so it can be used in sound synthesis
-    return newFreq;
-
-        }
-
-        const myCtx = new AudioContext();
-        
-
-        document.querySelector("#Play").onclick = () => playNote(myCtx, randomPitch(), 2);
+        document.querySelector("#Button1").onclick = () => playNote1(myCtx, randomPitch(), 2);
     
-       
+    
+
+
+         function playNote(someContext, frequency, duration)
+        {
+            const osc4 = new OscillatorNode(someContext);
+            const osc5 = new OscillatorNode(someContext);
+            const osc6 = new OscillatorNode(someContext);
+            const gain = new GainNode(someContext);
+        
+            
+            osc4.frequency.value = frequency;
+            osc5.frequency.value = frequency*2.01;
+            osc6.frequency.value = frequency*1.01;
+            osc4.type = "triangle"
+            osc5.type = "triangle"
+            osc6.type = "sine"
+            gain.gain.value = 0;
+
+            osc4.connect(gain).connect(someContext.destination);
+            osc5.connect(gain).connect(someContext.destination);
+            osc6.connect(gain).connect(someContext.destination);
+
+            let now = someContext.currentTime;
+
+            gain.gain.linearRampToValueAtTime(0.25, now + 0.01); //attack
+            gain.gain.linearRampToValueAtTime(0.10, now + 0.01 + 0.2)
+            gain.gain.linearRampToValueAtTime(0, now + duration); //release
+
+            osc4.start();
+            osc4.stop(now + duration);
+
+            osc5.start();
+            osc5.stop(now + duration);
+
+            osc6.start();
+            osc6.stop(now + duration);
+
+ }
+ const myCtx = new AudioContext();
+
+
+
+  let newFreq2 = 440 
+
+let dur2 = 1
+
+
+        document.querySelector("#Button2").onclick = () => playNote2(myCtx, randomPitch(), 2);
+
     </script>
+
     
 </body>
 
